@@ -36,14 +36,14 @@ p = [51, 3, 190, 211, 218, 30, 27, 64, 65, 158, 42, 99, 78, 48,
 
 gradients2D = []
 for i in [0, m.pi/2, m.pi, 3*m.pi/2, m.pi/4, 3*m.pi/4, 5*m.pi/4, 7*m.pi/4]:
-    gradients.append((m.cos(i), m.sin(i)))
+    gradients2D.append((m.cos(i), m.sin(i)))
 
 
 
 def get_gradient2D(i, j):
     I, J = i & 0xff , j & 0xff
   
-    idx = p[(I + p[J])&0xff] % len(gradients)
+    idx = p[(I + p[J])&0xff] % len(gradients2D)
     return gradients2D[idx]
 
 
@@ -100,6 +100,7 @@ def make_2D_array(w, h):
     array = []
     for i in range(h):
         array.append([0]*w)
+    return array
 
 
 def make_perlin_noise(w, h, p, n):

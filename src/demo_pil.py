@@ -7,6 +7,7 @@ __date__   = "Mon May 31 21:41:05 2010"
 
 from PIL import Image
 import noise
+import os
 
 
 
@@ -26,7 +27,7 @@ def make_image2D(values, num_octaves, persistence, outdir):
 
 def make_batch():
     PREFIX="./"
-    outdir = PREFIX+"gradient_perlin_out\\"
+    outdir = PREFIX+"gradient_perlin_out/"
      
     try:
         os.mkdir(outdir)
@@ -38,7 +39,7 @@ def make_batch():
     for p in [0.1, 0.25, 0.5, 0.75, 1.0]:
         for n in range(1, 10):
             values = noise.make_perlin_noise(w, h, p, n)
-            values /= values.max()
+            #values /= values.max()
             make_image2D(values, n, p, outdir)
 
 
@@ -47,6 +48,11 @@ def make_one():
     PREFIX="./"
     outdir = PREFIX+"gradient_perlin_out/"
 
+    try:
+        os.mkdir(outdir)
+    except:
+        pass
+
     w, h = 256, 256
     p = 0.5
     n = 4
@@ -54,4 +60,5 @@ def make_one():
     make_image2D(values, n, p, outdir)
 
 if __name__ == '__main__':
-    make_one()
+    #make_one()
+    make_batch()
