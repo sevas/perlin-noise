@@ -13,7 +13,7 @@ import noise
 
 if __name__ == '__main__':
     w, h = 256,256
-    p, n = 0.5, 4
+    p, n = 1.0, 5
     values = np.zeros((w, h))
     for i in range(w-1):
         for j in range(h-1):
