@@ -42,7 +42,7 @@ for i in [0, m.pi/2, m.pi, 3*m.pi/2, m.pi/4, 3*m.pi/4, 5*m.pi/4, 7*m.pi/4]:
 def get_gradient2D(i, j):
     I, J = i & 0xff , j & 0xff
   
-    idx = p[(I + self.perm[J])&0xff] % len(gradients)
+    idx = p[(I + p[J])&0xff] % len(gradients)
     return gradients2D[idx]
 
 
