@@ -37,7 +37,7 @@ def make_batch():
 
     for p in [0.1, 0.25, 0.5, 0.75, 1.0]:
         for n in range(1, 10):
-            values = noise.make_perlin_noise(w, h, p, n, grads)
+            values = noise.make_perlin_noise(w, h, p, n)
             values /= values.max()
             make_image2D(values, n, p, outdir)
 

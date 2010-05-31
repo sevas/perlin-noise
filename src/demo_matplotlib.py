@@ -13,15 +13,15 @@ import noise
 
 if __name__ == '__main__':
     w, h = 256,256
-    grads = Gradients(256)
-
+    p, n = 0.5, 4
     values = np.zeros((w, h))
     for i in range(w-1):
         for j in range(h-1):
             x, y = float(i)/(w), float(j)/(h)
-            values[i, j] = noise.perlin_noise(x, y, grads) 
+            values[i, j] = noise.perlin_noise(x, y, p, n) 
 
-        
+
+    #normalize & show 
     values/=values.max()
     plt.imshow(values, cmap=plt.cm.gray)
     plt.colorbar()
