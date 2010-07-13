@@ -24,8 +24,8 @@ if __name__ == '__main__':
             x, y = float(i)/(w), float(j)/(h)
             #fractal_sum[i, j] = noise.make_fractal_sum_2D(x, y, n)
             #turbulence[i, j] = noise.make_turbulence_2D(x, y, n)
-            #ridges[i, j] = noise.make_ridgedmf(x, y, n, 5.0)
-            noise_values[i, j] = noise.noise2D(i, j)
+            #noise_values[i, j] = noise.make_ridgedmf(x, y, n, 5.0)
+            noise_values[i, j] = noise.make_marble_2D(x, y, n)
         
     values = noise_values
     #normalize & show 

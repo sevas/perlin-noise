@@ -132,22 +132,15 @@ def make_ridgedmf(x, y, n_octaves,  lacunarity=2.0, gain=0.5, offset=1.0):
         ampl *= gain         # 0.5**
     return sum
 
-    
-def make_2D_array(w, h):
-    array = []
-    for i in range(h):
-        array.append([0]*w)
-    return array
+def make_marble_2D(x, y, n_octaves, lacunarity=2.0, gain=0.5):
+    sum = 0.0
+    freq, ampl = 1.0, 0.5
+    for i in range(n_octaves):
+        sum+=abs(noise2D(x*freq, y*freq)) * ampl
+        freq *= lacunarity  # 2.0**i
+        ampl *= gain         # 0.5**i
 
-def make_perlin_noise(w, h, n):
-    noise_values = make_2D_array(w, h) 
-    for i in range(w-1):
-        for j in range(h-1):
-            noise_values[i][j] = make_fractal_sum_2D(float(i) / (w-1), float(j) / (h-1), n)
-            
-    return noise_values
-
-
+    return m.sin(x+sum)
 
 
 
