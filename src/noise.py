@@ -39,7 +39,6 @@ for i in [0, m.pi/2, m.pi, 3*m.pi/2, m.pi/4, 3*m.pi/4, 5*m.pi/4, 7*m.pi/4]:
     gradients2D.append((m.cos(i), m.sin(i)))
 
 
-
 def get_gradient2D(i, j):
     I, J = i & 0xff , j & 0xff
   
@@ -61,7 +60,7 @@ def f(t):
     return (t * ( t * ( t * (6*t**2 - 15*t + 10))))
 
 
-def noise(x, y):
+def noise2D(x, y):
     i, j = int(m.floor(x)), int(m.floor(y))
     g00 = get_gradient2D(i,   j)
     g01 = get_gradient2D(i,   j+1)
@@ -91,25 +90,66 @@ def perlin_noise(x, y,  p, n):
         freq = 2**i
         ampl = p**i
 
-        total += noise(x * freq, y * freq) * ampl
+        total += noise2D(x * freq, y * freq) * ampl
 
     return total
 
+def make_fractal_sum_2D(x, y, n_octaves, lacunarity=2.0, gain=0.5):
+    sum = 0.0
+    freq, ampl = 1.0, 0.5
+    for i in range(n_octaves):
+        sum += noise2D(x*freq, y*freq) * ampl
+        freq *= lacunarity  # 2.0**i
+        ampl *= gain         # 0.5**i
 
+    return sum
+
+
+def make_turbulence_2D(x, y, n_octaves, lacunarity=2.0, gain=0.5):
+    sum = 0.0
+    freq, ampl = 1.0, 0.5
+    for i in range(n_octaves):
+        sum += abs(noise2D(x*freq, y*freq)) * ampl
+        freq *= lacunarity  # 2.0**i
+        ampl *= gain         # 0.5**
+    return sum
+
+
+
+def make_ridgedmf(x, y, n_octaves,  lacunarity=2.0, gain=0.5, offset=1.0):
+    def ridge(h, offset):
+        h = abs(h)
+        h=offset - h
+        return h
+    sum = 0.0
+    freq, ampl = 1.0, 0.5
+    prev = 1.0
+    for i in range(n_octaves):
+        n = ridge(noise2D(x*freq, y*freq), offset)
+        sum += n*ampl*prev
+        prev = n
+        freq *= lacunarity  # 2.0**i
+        ampl *= gain         # 0.5**
+    return sum
+
+    
 def make_2D_array(w, h):
     array = []
     for i in range(h):
         array.append([0]*w)
     return array
 
-
-def make_perlin_noise(w, h, p, n):
+def make_perlin_noise(w, h, n):
     noise_values = make_2D_array(w, h) 
     for i in range(w-1):
         for j in range(h-1):
-            noise_values[i][j] = perlin_noise(float(i) / (w-1), float(j) / (h-1), p, n)
+            noise_values[i][j] = make_fractal_sum_2D(float(i) / (w-1), float(j) / (h-1), n)
             
     return noise_values
+
+
+
+
 
 
 

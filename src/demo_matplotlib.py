@@ -13,14 +13,21 @@ import noise
 
 if __name__ == '__main__':
     w, h = 256,256
-    p, n = 1.0, 5
-    values = np.zeros((w, h))
+    n = 8
+    fractal_sum = np.zeros((w, h))
+    turbulence = np.zeros_like(fractal_sum)
+    ridges = np.zeros_like(fractal_sum)
+    noise_values = np.zeros_like(fractal_sum)
+
     for i in range(w-1):
         for j in range(h-1):
             x, y = float(i)/(w), float(j)/(h)
-            values[i, j] = noise.perlin_noise(x, y, p, n) 
-
-
+            #fractal_sum[i, j] = noise.make_fractal_sum_2D(x, y, n)
+            #turbulence[i, j] = noise.make_turbulence_2D(x, y, n)
+            #ridges[i, j] = noise.make_ridgedmf(x, y, n, 5.0)
+            noise_values[i, j] = noise.noise2D(i, j)
+        
+    values = noise_values
     #normalize & show 
     values/=values.max()
     plt.imshow(values, cmap=plt.cm.gray)
