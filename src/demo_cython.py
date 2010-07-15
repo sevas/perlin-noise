@@ -38,17 +38,32 @@ N = 8
 gradients2D = [(m.cos(i * TAU / N), m.sin(i * TAU / N)) for i in range(N)]
 
 
-if __name__ == '__main__':
-    w, h = 1024,1024
+def main():
+    w, h = 512,512
     n = 8
 
     time_before = time.time()
     texture =  noise.make_turbulence_texture(w,h, n, p, gradients2D)
     print "Time elapsed : %f seconds [size=(%d, %d), fractal=%d]" % (time.time() - time_before, w, h, n)
-    
+
 
     #normalize & show
     texture/=texture.max()
     plt.imshow(texture)#, cmap=plt.cm.gray)
     plt.colorbar()
     plt.show()
+    
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) == 3 and sys.argv[1] == "profile":
+        import pstats, cProfile
+        import pyximport
+        pyximport.install()
+        command = """main()"""
+        cProfile.runctx( command, globals(), locals(), filename="demo_cython_%s.profile" % sys.argv[2])
+    else:
+        main()
+
+
+

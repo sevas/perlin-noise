@@ -1,13 +1,17 @@
+# encoding: utf-8
+# cython: profile=True
+
 from __future__ import division
 import numpy as np
 cimport numpy as np
-import cython
+cimport cython
+
 
 cdef extern from "math.h":
     cdef double floor(double)
     cdef double cos(double)
     cdef double sin(double)
-    cdef double abs(double)
+    cdef double fabs(double)
 
 
 
@@ -19,14 +23,18 @@ def get_gradient2D(int i, int j, np.ndarray[int] p, gradients2D):
     cdef int idx = p[idx1] % 8
     return gradients2D[idx]
 
-cpdef double lerp(double a, double b, double alpha):
-    return a*(1-alpha) + b*(alpha)
 
-cpdef double dot(v1, v2):
+cdef double lerp(double a, double b, double alpha):
+    return a*(1.0-alpha) + b*(alpha)
+
+
+
+cdef double dot(v1, v2):
     return v1[0]*v2[0] + v1[1]*v2[1]
 
 
-cpdef double f(double t):
+
+cdef double f(double t):
     return (t * ( t * ( t * (6.0*t**2 - 15.0*t + 10.0))))
 
 
@@ -60,18 +68,17 @@ def noise2D(double x, double y, np.ndarray[int] p, gradients2D):
     return nxy
 
 
+
 def make_turbulence2D(double x, double y, int n_octaves, double lacunarity, double gain, np.ndarray[int] p, gradients2D):
     cdef double sum = 0.0
     cdef double freq = 1.0
     cdef ampl = 0.5
     cdef int i
     for i in range(n_octaves):
-        sum += noise2D(x*freq, y*freq, p, gradients2D) * ampl
+        sum += fabs(noise2D(x*freq, y*freq, p, gradients2D)) * ampl
         freq *= lacunarity  # 2.0**i
         ampl *= gain         # 0.5**
     return sum
-
-
 
 
 
@@ -82,8 +89,6 @@ def make_turbulence_texture(int w, int h, int n_octaves,  np.ndarray[int] p, gra
     for i in range(w-1):
         for j in range(h-1):
             x, y = i/(w - 1), j/(h - 1)
-            #print x, y
             val = make_turbulence2D(x, y, n_octaves, 2.0, 0.5, p, gradients2D)
-            #print val
             out[i, j] = val
     return out

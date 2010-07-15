@@ -12,7 +12,7 @@ import noise
 import time
 
 
-if __name__ == '__main__':
+def main():
     w, h = 512,512
     n = 8
 
@@ -26,10 +26,14 @@ if __name__ == '__main__':
 
     print "Time elapsed : %f seconds [size=(%d, %d), fractal=%d]" % (time.time() - time_before, w, h, n)
     values = noise_values
-    #normalize & show 
+    #normalize & show
     values/=values.max()
     plt.imshow(values)#, cmap=plt.cm.gray)
     plt.colorbar()
     plt.show()
 
-n
+
+if __name__ == '__main__':
+    import cProfile
+    command = """main()"""
+    cProfile.runctx( command, globals(), locals(), filename="demo_matplotlib.profile" )
