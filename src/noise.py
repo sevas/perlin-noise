@@ -10,8 +10,6 @@ import random
 import math as m
 
 
-#p = range(256)
-#random.shuffle(p)
 
 p = [51, 3, 190, 211, 218, 30, 27, 64, 65, 158, 42, 99, 78, 48,
  238, 245, 228, 243, 38, 98, 2, 115, 226, 210, 36, 87, 9, 101, 23, 63,
@@ -32,11 +30,16 @@ p = [51, 3, 190, 211, 218, 30, 27, 64, 65, 158, 42, 99, 78, 48,
  184, 175, 37, 205, 225, 66, 128, 214, 13, 142, 118, 54, 137, 152,
  192, 47, 106, 149]
 
-        
+p = range(256)
+random.shuffle(p)
 
-gradients2D = []
-for i in [0, m.pi/2, m.pi, 3*m.pi/2, m.pi/4, 3*m.pi/4, 5*m.pi/4, 7*m.pi/4]:
-    gradients2D.append((m.cos(i), m.sin(i)))
+TAU = 2 * m.pi
+N = 8
+gradients2D = [(m.cos(i * TAU / N), m.sin(i * TAU / N)) for i in range(N)]
+
+#gradients2D = []
+#for i in [0, m.pi/2, m.pi, 3*m.pi/2, m.pi/4, 3*m.pi/4, 5*m.pi/4, 7*m.pi/4]:
+#    gradients2D.append((m.cos(i), m.sin(i)))
 
 
 def get_gradient2D(i, j):
