@@ -145,7 +145,10 @@ def make_marble_2D(x, y, n_octaves, lacunarity=2.0, gain=0.5):
 
     return m.sin(x+sum)
 
+if __name__ == '__main__':
+    pass
 
+    
 
 
 
