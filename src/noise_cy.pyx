@@ -14,14 +14,15 @@ cdef extern from "math.h":
     cdef double fabs(double)
 
 
-
-def get_gradient2D(int i, int j, np.ndarray[int] p, gradients2D):
+    
+@cython.boundscheck(False)
+def  compute_index(int i, int j, np.ndarray[int] p):
     cdef int I, J
     I = i & 0xff
     J =	j & 0xff
     cdef int idx1 = (I + p[J])&0xff
     cdef int idx = p[idx1] % 8
-    return gradients2D[idx]
+    return idx
 
 
 cdef double lerp(double a, double b, double alpha):
@@ -29,8 +30,9 @@ cdef double lerp(double a, double b, double alpha):
 
 
 
-cdef double dot(v1, v2):
-    return v1[0]*v2[0] + v1[1]*v2[1]
+cdef double dot(double a_x, double a_y,
+                double b_x, double b_y):
+    return a_x*b_x + a_y*b_y
 
 
 
@@ -39,25 +41,39 @@ cdef double f(double t):
 
 
 
-
-def noise2D(double x, double y, np.ndarray[int] p, gradients2D):
+@cython.boundscheck(False)
+def noise2D(double x, double y,
+            np.ndarray[int] p,
+            np.ndarray[double, ndim=2] gradients):
     cdef int i, j 
     i = int(floor(x))
     j =	int(floor(y))
-    g00 = get_gradient2D(i,   j, p, gradients2D)
-    g01 = get_gradient2D(i,   j+1, p, gradients2D)
-    g10 = get_gradient2D(i+1, j, p, gradients2D)
-    g11 = get_gradient2D(i+1, j+1, p, gradients2D)
+
+    cdef int idx = compute_index(i, j, p)
+    g00_x = gradients[idx,0]
+    g00_y = gradients[idx,1]
+
+    idx = compute_index(i, j+1, p)
+    g01_x = gradients[idx,0]
+    g01_y = gradients[idx,1]
+
+    idx = compute_index(i+1, j, p)
+    g10_x = gradients[idx,0]
+    g10_y = gradients[idx,1]
+    
+    idx = compute_index(i+1, j+1, p)
+    g11_x = gradients[idx, 0]
+    g11_y = gradients[idx, 1]
  
     cdef double u, v 
     u = (x-i)
     v =	(y-j)
  
     # intepolation ramps
-    cdef double n00 = dot(g00, (u, v))
-    cdef double n01 = dot(g01, (u, v-1))
-    cdef double n10 = dot(g10, (u-1, v))
-    cdef double n11 = dot(g11, (u-1, v-1))
+    cdef double n00 = dot(g00_x, g00_y, u, v)
+    cdef double n01 = dot(g01_x, g01_y, u, v-1)
+    cdef double n10 = dot(g10_x, g10_y, u-1, v)
+    cdef double n11 = dot(g11_x, g11_y, u-1, v-1)
  
     # blending
     cdef double nx0 = lerp(n00, n10, f(u))
@@ -69,26 +85,31 @@ def noise2D(double x, double y, np.ndarray[int] p, gradients2D):
 
 
 
-def make_turbulence2D(double x, double y, int n_octaves, double lacunarity, double gain, np.ndarray[int] p, gradients2D):
+def make_turbulence2D(double x, double y, int n_octaves,
+                      double lacunarity, double gain,
+                      np.ndarray[int] p,
+                      np.ndarray[double, ndim=2] gradients):
     cdef double sum = 0.0
     cdef double freq = 1.0
     cdef ampl = 0.5
     cdef int i
     for i in range(n_octaves):
-        sum += fabs(noise2D(x*freq, y*freq, p, gradients2D)) * ampl
+        sum += fabs(noise2D(x*freq, y*freq, p, gradients)) * ampl
         freq *= lacunarity  # 2.0**i
         ampl *= gain         # 0.5**
     return sum
 
 
 
-def make_turbulence_texture(int w, int h, int n_octaves,  np.ndarray[int] p, gradients2D):
+def make_turbulence_texture(int w, int h, int n_octaves,
+                            np.ndarray[int] p,
+                            np.ndarray[double, ndim=2] gradients):
     cdef np.ndarray[double, ndim=2] out = np.zeros((w,h))
     cdef int i, j
     cdef double x, y
     for i in range(w-1):
         for j in range(h-1):
             x, y = i/(w - 1), j/(h - 1)
-            val = make_turbulence2D(x, y, n_octaves, 2.0, 0.5, p, gradients2D)
+            val = make_turbulence2D(x, y, n_octaves, 2.0, 0.5, p, gradients)
             out[i, j] = val
     return out
